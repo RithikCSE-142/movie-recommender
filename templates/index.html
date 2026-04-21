@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Movix</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #0b0b0b;
+    color: white;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 40px;
+    background: rgba(0,0,0,0.9);
+}
+
+.logo img { height: 60px; }
+
+.nav-links span {
+    margin-left: 25px;
+    cursor: pointer;
+    color: #aaa;
+    transition: 0.25s;
+}
+.nav-links span:hover { color: white; }
+
+/* HERO */
+.hero {
+    height: 260px;
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+    background: linear-gradient(to top, #0b0b0b, transparent),
+                url('{{ url_for("static", filename="banner.jpg") }}');
+    background-size: cover;
+}
+
+/* SEARCH */
+.search-box {
+    text-align: center;
+    margin: 20px;
+}
+
+.search-box input {
+    padding: 12px;
+    width: 320px;
+    border-radius: 20px;
+    border: none;
+}
+
+.search-box button {
+    padding: 12px;
+    background: #E50914;
+    border: none;
+    color: white;
+    border-radius: 20px;
+}
+
+/* ROWS */
+.row { padding: 20px 40px; }
+
+.row-posters {
+    display: flex;
+    gap: 16px;
+    overflow-x: auto;
+}
+.row-posters::-webkit-scrollbar { display: none; }
+
+.card {
+    min-width: 180px;
+    cursor: pointer;
+}
+
+.card img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+/* PREVIEW */
+.preview {
+    position: fixed;
+    width: 320px;
+    background: #181818;
+    border-radius: 12px;
+    overflow: hidden;
+    z-index: 999;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.25s ease;
+    pointer-events: none;
+}
+
+.preview.show {
+    opacity: 1;
+    transform: scale(1);
+}
+
+.preview img {
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
+}
+
+.preview-content {
+    padding: 12px;
+}
+
+.preview-content h4 {
+    margin: 5px 0;
+    font-size: 16px;
+}
+
+.meta {
+    font-size: 13px;
+    color: #bbb;
+    margin-bottom: 6px;
+}
+
+.badge {
+    display: inline-block;
+    background: #333;
+    padding: 3px 7px;
+    border-radius: 5px;
+    font-size: 11px;
+    margin-right: 4px;
+}
+
+/* PANELS */
+.panel {
+    background:#181818;
+    padding:20px;
+    border-radius:10px;
+}
+
+/* WATCHLIST TEXT */
+.empty-msg { color: #777; }
+
+.selected {
+    outline: 2px solid #E50914;
+}
+
+/* 🔥 LOADING SPINNER (ADDED ONLY) */
+#loader {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: black;
+    color: white;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    font-size: 24px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔥 LOADER (ADDED ONLY) -->
+<div id="loader">Loading...</div>
+
+<div class="navbar">
+    <div class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}">
+    </div>
+    <div class="nav-links">
+        <span>Home</span>
+        <span>Watchlist</span>
+        <span>Account</span>
+    </div>
+</div>
+
+<div class="hero">
+    <h1>Discover Movies</h1>
+</div>
+
+<div class="search-box">
+<form method="post" onsubmit="showLoader()">
+<input type="text" name="movie" placeholder="Search movie..." value="{{ search_value }}">
+<button type="submit">Search</button>
+</form>
+</div>
+
+<!-- TOP RATED -->
+<div class="row">
+<h2>Top Rated Movies</h2>
+<div class="row-posters">
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="The Shawshank Redemption" data-year="1994" data-genre="Drama" data-rating="9.3">
+<img src="/static/posters/the_shawshank_redemption.jpg">
+</div>
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="The Godfather" data-year="1972" data-genre="Crime • Drama" data-rating="9.2">
+<img src="/static/posters/godfather.jpg">
+</div>
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="The Dark Knight" data-year="2008" data-genre="Action • Crime" data-rating="9.0">
+<img src="/static/posters/the_dark_knight.jpg">
+</div>
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="12 Angry Men" data-year="1957" data-genre="Drama" data-rating="9.0">
+<img src="/static/posters/12_angry_men.jpg">
+</div>
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="LOTR: Return of the King" data-year="2003" data-genre="Fantasy • Adventure" data-rating="9.0">
+<img src="/static/posters/lord_of_rings.jpg">
+</div>
+
+</div>
+</div>
+
+<!-- PEOPLE CHOICE -->
+<div class="row">
+<h2>People’s Choice</h2>
+<div class="row-posters">
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="Fight Club" data-year="1999" data-genre="Drama" data-rating="8.8">
+<img src="/static/posters/fight_club.jpg">
+</div>
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="Avengers: Endgame" data-year="2019" data-genre="Action • Sci-Fi" data-rating="8.4">
+<img src="/static/posters/avengers_endgames.jpg">
+</div>
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="Lady Bird" data-year="2017" data-genre="Drama" data-rating="7.4">
+<img src="/static/posters/lady_bird.jpg">
+</div>
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="Toy Story 2" data-year="1999" data-genre="Animation • Family" data-rating="7.9">
+<img src="/static/posters/toy_story_2.jpg">
+</div>
+
+<div class="card" onmouseenter="startHover(this)" onmouseleave="endHover()"
+ data-title="Parasite" data-year="2019" data-genre="Thriller • Drama" data-rating="8.6">
+<img src="/static/posters/parasite.jpg">
+</div>
+
+</div>
+</div>
+
+<!-- WATCHLIST -->
+<div class="row">
+<h2>Your Watchlist</h2>
+<div class="row-posters">
+<p class="empty-msg">No movies in your watchlist yet</p>
+</div>
+</div>
+
+<!-- PREVIEW -->
+<div id="previewBox" class="preview"></div>
+
+<script>
+let hoverTimer;
+let removeTimer;
+let previewBox = document.getElementById("previewBox");
+
+// =====================
+// 🎬 HOVER PREVIEW (ORIGINAL - RESTORED)
+// =====================
+function startHover(card) {
+    clearTimeout(removeTimer);
+
+    hoverTimer = setTimeout(() => {
+        let img = card.querySelector("img");
+
+        previewBox.innerHTML = `
+            <img src="${img.src}">
+            <div class="preview-content">
+                <h4>${card.dataset.title}</h4>
+                <div class="meta">⭐ ${card.dataset.rating} | 📅 ${card.dataset.year}</div>
+                <span class="badge">${card.dataset.genre}</span>
+            </div>
+        `;
+
+        previewBox.style.top = (card.getBoundingClientRect().top - 100) + "px";
+        previewBox.style.left = (card.getBoundingClientRect().left - 40) + "px";
+
+        previewBox.classList.add("show");
+    }, 300);
+}
+
+function endHover() {
+    clearTimeout(hoverTimer);
+    removeTimer = setTimeout(() => {
+        previewBox.classList.remove("show");
+    }, 200);
+}
+
+// =====================
+// 🎯 SELECT MOVIE
+// =====================
+function selectMovie(card) {
+    document.querySelectorAll(".card").forEach(c => c.classList.remove("selected"));
+    card.classList.add("selected");
+
+    document.getElementById("d_title").innerText = card.dataset.title;
+    document.getElementById("d_rating").innerText = card.dataset.rating;
+    document.getElementById("d_year").innerText = card.dataset.year;
+    document.getElementById("d_overview").innerText = card.dataset.overview;
+
+    document.getElementById("d_director").innerText = card.dataset.director;
+    document.getElementById("d_cast").innerText = card.dataset.cast;
+
+    document.getElementById("detailsPanel").scrollIntoView({ behavior: "smooth" });
+}
+
+// =====================
+// 🔍 SEARCH SUGGESTIONS (SAFE ADD)
+// =====================
+const input = document.querySelector("input[name='movie']");
+const suggestionsBox = document.createElement("div");
+
+suggestionsBox.style.position = "absolute";
+suggestionsBox.style.background = "#181818";
+suggestionsBox.style.width = "320px";
+suggestionsBox.style.borderRadius = "10px";
+suggestionsBox.style.overflow = "hidden";
+suggestionsBox.style.zIndex = "1000";
+
+document.querySelector(".search-box").appendChild(suggestionsBox);
+
+input.addEventListener("input", async () => {
+    let query = input.value.trim();
+
+    if (query.length < 2) {
+        suggestionsBox.innerHTML = "";
+        return;
+    }
+
+    let res = await fetch(`/search_suggestions?q=${query}`);
+    let data = await res.json();
+
+    suggestionsBox.innerHTML = "";
+
+    data.forEach(movie => {
+        let div = document.createElement("div");
+        div.innerText = movie;
+
+        div.style.padding = "10px";
+        div.style.cursor = "pointer";
+        div.style.borderBottom = "1px solid #333";
+
+        div.onclick = () => {
+            input.value = movie;
+            suggestionsBox.innerHTML = "";
+        };
+
+        suggestionsBox.appendChild(div);
+    });
+});
+
+// hide suggestions
+document.addEventListener("click", (e) => {
+    if (!e.target.closest(".search-box")) {
+        suggestionsBox.innerHTML = "";
+    }
+});
+</script>
+
+</body>
+</html>
