@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Movix</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+<style>
+body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: #0b0b0b;
+    color: white;
+}
+
+/* NAVBAR */
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 40px;
+    background: rgba(0,0,0,0.9);
+    backdrop-filter: blur(6px);
+}
+
+.logo img { height: 60px; }
+
+.nav-links span {
+    margin-left: 25px;
+    cursor: pointer;
+    color: #aaa;
+    transition: 0.25s;
+}
+.nav-links span:hover { color: white; }
+
+/* HERO */
+.hero {
+    height: 260px;
+    display: flex;
+    align-items: center;
+    padding-left: 40px;
+    background: linear-gradient(to top, #0b0b0b, transparent),
+                url('{{ url_for("static", filename="banner.jpg") }}');
+    background-size: cover;
+}
+
+.hero h1 {
+    font-size: 32px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+/* ROW */
+.row { padding: 20px 40px; }
+
+/* GRID */
+.row-posters {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+}
+
+/* CARD */
+.card {
+    width: 180px;
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: scale(1.08);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+}
+
+.card img {
+    width: 100%;
+    border-radius: 10px;
+}
+
+/* WATCHLIST BUTTON */
+.card button {
+    margin-top: 8px;
+    width: 100%;
+    padding: 7px;
+    border: none;
+    background: #E50914;
+    color: white;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: 0.25s;
+}
+
+.card button:hover {
+    background: #ff1f2b;
+}
+
+/* PANEL */
+.panel {
+    background:#181818;
+    padding:20px;
+    border-radius:10px;
+    line-height: 1.6;
+}
+
+/* DETAILS TEXT */
+.panel h2 {
+    margin-bottom: 10px;
+    font-size: 24px;
+}
+
+.panel p {
+    color: #ccc;
+    font-size: 14px;
+}
+
+/* BACK BUTTON */
+.back-btn {
+    margin:20px 40px;
+    padding:10px 20px;
+    background:#E50914;
+    border:none;
+    color:white;
+    cursor:pointer;
+    border-radius:20px;
+    transition: 0.25s;
+}
+
+.back-btn:hover {
+    background:#ff1f2b;
+}
+</style>
+</head>
+
+<body>
+
+<div class="navbar">
+    <div class="logo">
+        <img src="{{ url_for('static', filename='logo.png') }}">
+    </div>
+    <div class="nav-links">
+        <span onclick="goBack()">Home</span>
+        <span>Watchlist</span>
+        <span>Account</span>
+    </div>
+</div>
+
+<div class="hero">
+    <h1>Results for "{{ search_value }}"</h1>
+</div>
+
+<button class="back-btn" onclick="goBack()">⬅ Back</button>
+
+<div class="row">
+<div class="row-posters">
+
+{% for m in recs %}
+<div class="card"
+ onclick="selectMovie(this)"
+ data-title="{{ m.title }}"
+ data-overview="{{ m.overview }}"
+ data-cast="{{ m.cast }}"
+ data-director="{{ m.director }}"
+ data-year="{{ m.year }}"
+ data-rating="{{ m.rating }}"
+ data-genre="{{ m.genre }}">
+
+<img src="{{ m.poster }}">
+
+<button onclick="addToWatchlist('{{ m.title }}')">
++ Watchlist
+</button>
+
+</div>
+{% endfor %}
+
+</div>
+</div>
+
+<div class="row">
+<div class="panel" id="detailsPanel">
+<h2 id="d_title">{{ selected.title }}</h2>
+<p>⭐ <span id="d_rating">{{ selected.rating }}</span> | 📅 <span id="d_year">{{ selected.year }}</span></p>
+<p id="d_overview">{{ selected.overview }}</p>
+</div>
+</div>
+
+<div class="row">
+<div class="panel">
+<p><b>Director:</b> <span id="d_director">{{ selected.director }}</span></p>
+<p><b>Cast:</b> <span id="d_cast">{{ selected.cast }}</span></p>
+</div>
+</div>
+
+<script>
+function goBack(){
+    window.location.href = "/";
+}
+
+function addToWatchlist(title){
+    fetch("/add_watchlist", {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        body: JSON.stringify({title:title})
+    })
+    alert("Added to Watchlist");
+}
+
+function selectMovie(card){
+    document.getElementById("d_title").innerText = card.dataset.title;
+    document.getElementById("d_rating").innerText = card.dataset.rating;
+    document.getElementById("d_year").innerText = card.dataset.year;
+    document.getElementById("d_overview").innerText = card.dataset.overview;
+    document.getElementById("d_director").innerText = card.dataset.director;
+    document.getElementById("d_cast").innerText = card.dataset.cast;
+}
+</script>
+
+</body>
+</html>
