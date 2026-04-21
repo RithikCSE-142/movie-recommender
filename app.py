@@ -5,7 +5,13 @@ import sqlite3
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-app = Flask(__name__, static_folder='static')
+from flask import Flask, send_from_directory
+
+app = Flask(__name__)
+
+@app.route('/static/<path:filename>')
+def static_files(filename):
+    return send_from_directory('static', filename)
 
 API_KEY = "aa92a819865e110c56447aed38088de8"
 
