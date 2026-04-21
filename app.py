@@ -5,7 +5,7 @@ import sqlite3
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-app = Flask(__name__)
+app = Flask(__name__, static_folder='static')
 
 API_KEY = "aa92a819865e110c56447aed38088de8"
 
